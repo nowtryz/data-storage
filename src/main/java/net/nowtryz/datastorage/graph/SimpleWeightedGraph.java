@@ -1,4 +1,4 @@
-package net.nowtryz.datastorage.graphs;
+package net.nowtryz.datastorage.graph;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 

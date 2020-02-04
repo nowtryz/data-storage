@@ -1,8 +1,7 @@
-package net.nowtryz.datastorage.vertices;
-
-import net.nowtryz.datastorage.Data;
+package net.nowtryz.datastorage.entity;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -14,7 +13,7 @@ import java.util.stream.Collectors;
 public class SystemNode extends Node {
     private static int current_id = 0;
     private int capacity;
-    private int[] storage = new int[0];
+    private List<Integer> storage = new LinkedList<>();
 
     /**
      * Create a SystemNode instance
@@ -32,7 +31,7 @@ public class SystemNode extends Node {
      */
     public SystemNode(int capacity, int[] dataIds) {
         this(capacity);
-        this.storage = dataIds;
+        Arrays.stream(dataIds).forEach(this::addToStorage);
     }
 
     /**
@@ -40,9 +39,7 @@ public class SystemNode extends Node {
      * @param id the id of the data
      */
     public void addToStorage(int id) {
-        List<Integer> newStorage = Arrays.stream(storage).boxed().collect(Collectors.toList());
-        newStorage.add(id);
-        storage = newStorage.stream().mapToInt(Integer::intValue).toArray();
+        storage.add(id);
     }
 
     /**
@@ -50,7 +47,7 @@ public class SystemNode extends Node {
      * @return the used space of this node
      */
     public int getUsedSpace() {
-        return Arrays.stream(storage).mapToObj(Data::getFromId).filter(Objects::nonNull).mapToInt(Data::getSize).sum();
+        return this.storage.stream().map(Data::getFromId).filter(Objects::nonNull).mapToInt(Data::getSize).sum();
     }
 
     /**
@@ -58,7 +55,7 @@ public class SystemNode extends Node {
      * @return the free space
      */
     public int getFreeSpace() {
-        return this.capacity - this.getUsedSpace();
+        return capacity - getUsedSpace();
     }
 
     /**
@@ -74,15 +71,8 @@ public class SystemNode extends Node {
      * {@inheritDoc}
      */
     @Override
-    public Node[] getNeighbours() {
-        return new Node[0];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String toString() {
-        return "SystemNode(" + id + ", " + getUsedSpace() + '/' + capacity + ')';
+        String ids = this.storage.stream().map(Object::toString).collect(Collectors.joining(", "));
+        return "SystemNode(" + id + ", " + getUsedSpace() + '/' + capacity + ", data(" + ids + "))";
     }
 }

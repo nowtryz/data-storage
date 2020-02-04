@@ -1,4 +1,4 @@
-package net.nowtryz.datastorage;
+package net.nowtryz.datastorage.entity;
 
 import java.util.HashMap;
 import java.util.Map;
