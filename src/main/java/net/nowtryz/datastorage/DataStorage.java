@@ -1,10 +1,15 @@
 package net.nowtryz.datastorage;
 
+import javafx.util.converter.IntegerStringConverter;
 import net.nowtryz.datastorage.entity.Data;
 import net.nowtryz.datastorage.entity.SystemNode;
 import net.nowtryz.datastorage.entity.User;
 import net.nowtryz.datastorage.graph.DataGraph;
 import net.nowtryz.datastorage.gui.GraphWindow;
+
+import javax.print.attribute.IntegerSyntax;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class DataStorage {
     // create system nodes
@@ -29,7 +34,7 @@ public class DataStorage {
         DataGraph graph = new DataGraph();
 
         // Add system nodes
-        SystemNode[] nodes = new SystemNode[]{node0, node1, node2};
+        SystemNode[] nodes = {node0, node1, node2};
         for (SystemNode node: nodes) graph.addVertex(node);
 
         // add users
@@ -55,7 +60,7 @@ public class DataStorage {
         DataGraph graph = new DataGraph();
 
         // Add system nodes
-        SystemNode[] nodes = new SystemNode[]{node0, node1, node2, node3};
+        SystemNode[] nodes = {node0, node1, node2, node3};
         for (SystemNode node: nodes) graph.addVertex(node);
 
         // add users
@@ -86,7 +91,7 @@ public class DataStorage {
         DataGraph graph = new DataGraph();
 
         // Add system nodes
-        SystemNode[] nodes = new SystemNode[]{node0, node1, node2};
+        SystemNode[] nodes = {node0, node1, node2};
         for (SystemNode node: nodes) graph.addVertex(node);
 
         // add users
@@ -105,6 +110,12 @@ public class DataStorage {
             System.err.println(e.getMessage());
         }
 
+        System.out.println(graph.getData(new User []{user0}).mapToInt(Data::getId)
+                .collect(
+                    StringBuilder::new,
+                    StringBuilder::appendCodePoint,
+                    StringBuilder::append)
+                .toString());
 
         return graph;
     }

@@ -1,5 +1,6 @@
 package net.nowtryz.datastorage.graph;
 
+import com.sun.istack.internal.NotNull;
 import net.nowtryz.datastorage.entity.Data;
 import net.nowtryz.datastorage.entity.Node;
 import net.nowtryz.datastorage.entity.SystemNode;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static net.nowtryz.datastorage.util.Utils.arrayContains;
+import static net.nowtryz.datastorage.util.Arrays.arrayContains;
 
 /**
  * Specific graph to hold system nodes and users
@@ -60,19 +61,25 @@ public class DataGraph extends SimpleWeightedGraph<Node> {
     }
 
     /**
-     * Collect all data users of the graph are interested in and place them and the right position in order to let it be
-     * the closest possible of all interested users.<br>
-     * This method does not care of the <i>MKP (Multiple Knapsack Problem)</i>
+     * Filter vertices supplied to the graph to fetch all users and return them as a array
+     * @return an array of User
      */
-    public void placeData() {
-        // get a user stream to manipulate users of the graph
-        User[] users = this.vertexSet().stream()
-                .filter(User.class::isInstance)
-                .map(User.class::cast)
-                .toArray(User[]::new);
+    public User[] getUsers() {
+        return this.vertexSet().stream()
+            .filter(User.class::isInstance)
+            .map(User.class::cast)
+            .toArray(User[]::new);
+    }
 
-        // retrieve data of each user
-        Arrays.stream(users).parallel()
+    /**
+     * Fetch all date the given users are interested in. The resulting {@link Stream} doesn't contain any duplicates or
+     * null values.
+     * @param users the users from which to gather interests
+     * @return a not yet used stream of Data
+     */
+    @NotNull
+    public Stream<Data> getData(@NotNull  User[] users) {
+        return Arrays.stream(users).parallel()
                 .map(User::getInterests)
                 // get a list of all distinct data id needed in the graph
                 .map(Arrays::stream)
@@ -80,9 +87,35 @@ public class DataGraph extends SimpleWeightedGraph<Node> {
                 .distinct()
                 // get Data objects from the list of id
                 .filter(Objects::nonNull)
-                .map(Data::getFromId)
+                .map(Data::getFromId);
+    }
+
+    /**
+     * Collect all data users of the graph are interested in and place them and the right position in order to let it be
+     * the closest possible of all interested users.<br>
+     * This method does not care of the <i>MKP (Multiple Knapsack Problem)</i>
+     */
+    public void placeData() {
+        // get a user stream to manipulate users of the graph
+        User[] users = this.getUsers();
+
+        // retrieve data of each user
+        this.getData(users)
                 // for each data, get interested users and call placeData for the specific data
                 .forEach(data -> this.placeSpecificData(data, Arrays.stream(users)
+                        .filter(user -> arrayContains(user.getInterests(), data.getId()))
+                        .toArray(User[]::new)
+                ));
+    }
+
+    public void optimizedPlacement() {
+        // get a user stream to manipulate users of the graph
+        User[] users = this.getUsers();
+
+        // retrieve data of each user
+        this.getData(users)
+                // for each data, get interested users and call placeData for the specific data
+                .forEach(data -> this.optimizedPlacement(data, Arrays.stream(users)
                         .filter(user -> arrayContains(user.getInterests(), data.getId()))
                         .toArray(User[]::new)
                 ));
@@ -106,7 +139,9 @@ public class DataGraph extends SimpleWeightedGraph<Node> {
 
     /**
      * Place a specific data, the nearest possible of all given users. To place the data, we will give a score to
-     * each node, which is the sum of the inverse of distances from all interested users and we take the lowest score node.
+     * each node, which is obtained by computing the quadratic mean of distances from all interested users to the node
+     * they are placed in and we take the lowest score node.
+     * This method does not care of the <i>MKP (Multiple Knapsack Problem)</i>
      * @param data the data to place
      * @param users users that are interested in the data
      */
@@ -121,7 +156,7 @@ public class DataGraph extends SimpleWeightedGraph<Node> {
                 .collect(Collectors.toMap(x -> x, x -> Arrays
                         .stream(users)
                         .mapToDouble(u -> DijkstraShortestPath.findPathBetween(this, u, x).getWeight())
-                        .map(d -> 1/d)
+                        .map(d -> d * d)
                         .sum()
                 ));
 
@@ -133,5 +168,18 @@ public class DataGraph extends SimpleWeightedGraph<Node> {
 
         // add the data to the best node
         bestNode.get().addToStorage(data.getId());
+    }
+
+    /**
+     * Place a specific data as solving the multiple knapsack problem (MKP).
+     *
+     * <p>The <i>profit</i> of each {@link Data} is obtained by computing the quadratic mean distances from all
+     * interested users to the node they are placed in and there <i>weight</i> are simple their size. With this, Data
+     * will be put the closest possible to their interested users in an optimized way.
+     * @param data the data to place
+     * @param users users that are interested in the data
+     */
+    protected  void optimizedPlacement(Data data, User[] users) {
+        // TODO
     }
 }
