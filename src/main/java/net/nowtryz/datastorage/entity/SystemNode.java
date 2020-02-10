@@ -91,6 +91,10 @@ public class SystemNode extends Node {
         return capacity;
     }
 
+    public void clear() {
+        storage.clear();
+    }
+
     /**
      * {@inheritDoc}
      */

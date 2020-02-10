@@ -22,9 +22,15 @@ public class DataStorage {
         new Data(25); // data 1
         new Data(25); // data 2
 
-//         new GraphWindow<>(question2()).display("question 2");
-//         new GraphWindow<>(question3()).display("question 3");
-        new GraphWindow<>(question4()).display("question 4");
+         new GraphWindow<>(question4()).display("question 4");
+         clear();
+         new GraphWindow<>(question3()).display("question 3");
+         clear();
+         new GraphWindow<>(question2()).display("question 2");
+    }
+
+    static void clear() {
+        for (SystemNode node : new SystemNode[]{node0, node1, node2, node3}) node.clear();
     }
 
     static AbstractDataGraph question2() {
