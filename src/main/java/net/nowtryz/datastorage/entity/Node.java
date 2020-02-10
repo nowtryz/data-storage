@@ -1,6 +1,6 @@
 package net.nowtryz.datastorage.entity;
 
-import net.nowtryz.datastorage.graph.DataGraph;
+import net.nowtryz.datastorage.graph.AbstractDataGraph;
 import org.jgrapht.Graphs;
 
 import java.util.Collections;
@@ -35,7 +35,7 @@ public abstract class Node {
      * @param graph the graph to explore to search the current node
      * @return a list of nodes connected to the current node
      */
-    public List<Node> getNeighbours(DataGraph graph) {
+    public List<Node> getNeighbours(AbstractDataGraph graph) {
         return Graphs.neighborListOf(graph, this);
     }
 }

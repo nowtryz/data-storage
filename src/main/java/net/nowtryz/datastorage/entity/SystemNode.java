@@ -43,6 +43,14 @@ public class SystemNode extends Node {
     }
 
     /**
+     * Remove the data specified by the given id to the holden data of this node
+     * @param id the id of the data
+     */
+    public void removeFromStorage(Integer id) {
+        storage.remove(id);
+    }
+
+    /**
      * Get the used space of this node
      * @return the used space of this node
      */
@@ -65,6 +73,22 @@ public class SystemNode extends Node {
      */
     public boolean hasEnoughSpace(int need) {
         return need <= getFreeSpace();
+    }
+
+    /**
+     * Check weather the capacity of this node has been exceeded.
+     * @return if if is is the case, false otherwise
+     */
+    public boolean isOverweight() {
+        return  this.getUsedSpace() > capacity;
+    }
+
+    public List<Integer> getData() {
+        return new LinkedList<>(storage);
+    }
+
+    public int getCapacity() {
+        return capacity;
     }
 
     /**

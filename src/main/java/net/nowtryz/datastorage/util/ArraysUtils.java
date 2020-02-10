@@ -1,6 +1,6 @@
 package net.nowtryz.datastorage.util;
 
-public class Arrays {
+public class ArraysUtils {
     public static <T> boolean arrayContains(T[] array, T value) {
         for (T obj : array) if (obj.equals(value)) return true;
         return false;
