@@ -1,6 +1,5 @@
 package net.nowtryz.datastorage.graph;
 
-import com.sun.istack.internal.NotNull;
 import net.nowtryz.datastorage.entity.Data;
 import net.nowtryz.datastorage.entity.Node;
 import net.nowtryz.datastorage.entity.SystemNode;
@@ -9,12 +8,12 @@ import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.traverse.ClosestFirstIterator;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import static net.nowtryz.datastorage.util.ArraysUtils.arrayContains;
 
 /**
  * Specific graph to hold system nodes and users
@@ -88,8 +87,7 @@ public abstract class AbstractDataGraph extends SimpleWeightedGraph<Node> {
      * @param users the users from which to gather interests
      * @return a not yet used stream of Data
      */
-    @NotNull
-    protected List<Data> getData(@NotNull  User[] users) {
+    protected List<Data> getData(User[] users) {
         return Arrays.stream(users)
                 .map(User::getInterests)
                 // get a list of all distinct data id needed in the graph
